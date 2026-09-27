@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Рабочий стол</title>
+<style>
+  :root {
+    --dock-bg: rgba(246,248,255,0.50);
+    --window-bg: rgba(246, 246, 248, 0.86);
+    --titlebar-bg: rgba(236, 236, 240, 0.92);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  #desktop {
+    position: relative;
+    width: 100vw; height: 100vh;
+    background-image: url("assets/6c27761bf43e681c.jpg");
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+  }
+
+  .desktop-icon {
+    position: absolute;
+    width: 84px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    transform: translate(-50%, -50%);
+  }
+  .desktop-icon:hover, .desktop-icon:focus-visible {
+    background: rgba(255,255,255,0.14);
+    outline: none;
+  }
+  .desktop-icon:active .icon-art { transform: scale(0.94); }
+  .icon-art {
+    width: 52px; height: 44px;
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.35));
+    transition: transform 0.12s ease;
+  }
+  .icon-art svg { width: 100%; height: 100%; display: block; }
+  .icon-label {
+    font-size: 12px;
+    line-height: 1.25;
+    color: #fff;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.75), 0 0 1px rgba(0,0,0,0.6);
+    max-width: 84px;
+    word-break: break-word;
+    font-weight: 500;
+  }
+
+  .window {
+    position: absolute;
+    left: var(--wx);
+    top: var(--wy);
+    width: min(480px, 82vw);
+    height: min(360px, 60vh);
+    background: var(--window-bg);
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+    border-radius: 12px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.15);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 50;
+    opacity: 1;
+    transform: scale(1);
+  }
+  .window-toggle { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+  #toggle-win-0:checked ~ #win-0 { display: flex; }
+  #toggle-win-1:checked ~ #win-1 { display: flex; }
+  #toggle-win-2:checked ~ #win-2 { display: flex; }
+  #toggle-pw-f2-1:checked ~ #pw-f2-1 { display: flex; }
+  #toggle-pw-f2-2:checked ~ #pw-f2-2 { display: flex; }
+  #toggle-pw-f2-3:checked ~ #pw-f2-3 { display: flex; }
+  #toggle-pw-f2-4:checked ~ #pw-f2-4 { display: flex; }
+  #toggle-pw-f2-5:checked ~ #pw-f2-5 { display: flex; }
+  #toggle-pw-f2-6:checked ~ #pw-f2-6 { display: flex; }
+  #toggle-pw-f2-7:checked ~ #pw-f2-7 { display: flex; }
+  #toggle-pw-f2-8:checked ~ #pw-f2-8 { display: flex; }
+  #toggle-pw-f2-9:checked ~ #pw-f2-9 { display: flex; }
+  #toggle-pw-f2-10:checked ~ #pw-f2-10 { display: flex; }
+  #toggle-pw-f2-11:checked ~ #pw-f2-11 { display: flex; }
+  #toggle-pw-f2-12:checked ~ #pw-f2-12 { display: flex; }
+  #toggle-pw-f2-13:checked ~ #pw-f2-13 { display: flex; }
+  #toggle-pw-f2-14:checked ~ #pw-f2-14 { display: flex; }
+  #toggle-win-3:checked ~ #win-3 { display: flex; }
+  #toggle-pw-f3-1:checked ~ #pw-f3-1 { display: flex; }
+  #toggle-pw-f3-2:checked ~ #pw-f3-2 { display: flex; }
+  #toggle-pw-f3-3:checked ~ #pw-f3-3 { display: flex; }
+  #toggle-pw-f3-4:checked ~ #pw-f3-4 { display: flex; }
+  #toggle-pw-f3-5:checked ~ #pw-f3-5 { display: flex; }
+  #toggle-pw-f3-6:checked ~ #pw-f3-6 { display: flex; }
+  #toggle-pw-f3-7:checked ~ #pw-f3-7 { display: flex; }
+  #toggle-pw-f3-8:checked ~ #pw-f3-8 { display: flex; }
+  #toggle-pw-f3-9:checked ~ #pw-f3-9 { display: flex; }
+  #toggle-pw-f3-10:checked ~ #pw-f3-10 { display: flex; }
+  #toggle-pw-f3-11:checked ~ #pw-f3-11 { display: flex; }
+  #toggle-win-4:checked ~ #win-4 { display: flex; }
+  #toggle-pw-f4-1:checked ~ #pw-f4-1 { display: flex; }
+  #toggle-pw-f4-2:checked ~ #pw-f4-2 { display: flex; }
+  #toggle-pw-f4-3:checked ~ #pw-f4-3 { display: flex; }
+  #toggle-pw-f4-4:checked ~ #pw-f4-4 { display: flex; }
+  #toggle-pw-f4-5:checked ~ #pw-f4-5 { display: flex; }
+  #toggle-pw-f4-6:checked ~ #pw-f4-6 { display: flex; }
+  #toggle-pw-f4-7:checked ~ #pw-f4-7 { display: flex; }
+  #toggle-pw-f4-8:checked ~ #pw-f4-8 { display: flex; }
+  #toggle-pw-f4-9:checked ~ #pw-f4-9 { display: flex; }
+  #toggle-pw-f4-10:checked ~ #pw-f4-10 { display: flex; }
+  #toggle-pw-f4-11:checked ~ #pw-f4-11 { display: flex; }
+  #toggle-win-5:checked ~ #win-5 { display: flex; }
+  #toggle-pw-f5-1:checked ~ #pw-f5-1 { display: flex; }
+  #toggle-pw-f5-2:checked ~ #pw-f5-2 { display: flex; }
+  #toggle-pw-f5-3:checked ~ #pw-f5-3 { display: flex; }
+  #toggle-pw-f5-4:checked ~ #pw-f5-4 { display: flex; }
+  #toggle-pw-f5-5:checked ~ #pw-f5-5 { display: flex; }
+  #toggle-pw-f5-6:checked ~ #pw-f5-6 { display: flex; }
+  #toggle-pw-f5-7:checked ~ #pw-f5-7 { display: flex; }
+  #toggle-pw-f5-8:checked ~ #pw-f5-8 { display: flex; }
+  #toggle-win-6:checked ~ #win-6 { display: flex; }
+  #toggle-pw-f6-1:checked ~ #pw-f6-1 { display: flex; }
+  #toggle-pw-f6-2:checked ~ #pw-f6-2 { display: flex; }
+  #toggle-pw-f6-3:checked ~ #pw-f6-3 { display: flex; }
+  #toggle-pw-f6-4:checked ~ #pw-f6-4 { display: flex; }
+  #toggle-pw-f6-5:checked ~ #pw-f6-5 { display: flex; }
+  #toggle-pw-f6-6:checked ~ #pw-f6-6 { display: flex; }
+  #toggle-pw-f6-7:checked ~ #pw-f6-7 { display: flex; }
+  #toggle-pw-f6-8:checked ~ #pw-f6-8 { display: flex; }
+  #toggle-pw-f6-9:checked ~ #pw-f6-9 { display: flex; }
+  #toggle-pw-f6-10:checked ~ #pw-f6-10 { display: flex; }
+  #toggle-pw-f6-11:checked ~ #pw-f6-11 { display: flex; }
+  #toggle-pw-f6-12:checked ~ #pw-f6-12 { display: flex; }
+  #toggle-pw-f6-13:checked ~ #pw-f6-13 { display: flex; }
+  #toggle-pw-f6-14:checked ~ #pw-f6-14 { display: flex; }
+  #toggle-pw-f6-15:checked ~ #pw-f6-15 { display: flex; }
+  #toggle-pw-f6-16:checked ~ #pw-f6-16 { display: flex; }
+  #toggle-pw-f6-17:checked ~ #pw-f6-17 { display: flex; }
+  #toggle-pw-f6-18:checked ~ #pw-f6-18 { display: flex; }
+  #toggle-pw-f0-1:checked ~ #pw-f0-1 { display: flex; }
+  #toggle-pw-f0-2:checked ~ #pw-f0-2 { display: flex; }
+  #toggle-pw-f0-3:checked ~ #pw-f0-3 { display: flex; }
+  #toggle-pw-f0-4:checked ~ #pw-f0-4 { display: flex; }
+  #toggle-pw-f0-5:checked ~ #pw-f0-5 { display: flex; }
+  #toggle-pw-f1-1:checked ~ #pw-f1-1 { display: flex; }
+  #toggle-pw-f1-2:checked ~ #pw-f1-2 { display: flex; }
+  #toggle-pw-f1-3:checked ~ #pw-f1-3 { display: flex; }
+  #toggle-pw-f1-4:checked ~ #pw-f1-4 { display: flex; }
+  #toggle-pw-f1-5:checked ~ #pw-f1-5 { display: flex; }
+  #toggle-pw-f1-6:checked ~ #pw-f1-6 { display: flex; }
+  #toggle-pw-f1-7:checked ~ #pw-f1-7 { display: flex; }
+  .titlebar {
+    height: 40px; min-height: 40px;
+    background: var(--titlebar-bg);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    display: flex; align-items: center; padding: 0 14px;
+    position: relative; cursor: default;
+  }
+  .traffic { display: flex; align-items: center; gap: 8px; z-index: 2; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; border: none; padding: 0; cursor: default; position: relative; }
+  .dot-red { background: #ff5f57; cursor: pointer; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+  .dot .glyph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; line-height: 1; color: rgba(90,0,0,0.7); opacity: 0; font-weight: 700; }
+  .dot-red:hover .glyph { opacity: 1; }
+  .wtitle {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-size: 13px; font-weight: 600; color: #3a3a3c;
+    max-width: 60%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .wbody { flex: 1; display: flex; align-items: center; justify-content: center; }
+  .empty-state { display: flex; flex-direction: column; align-items: center; gap: 6px; color: #8a8a8e; }
+  .empty-state p { margin: 6px 0 0 0; font-size: 14px; font-weight: 600; color: #6e6e73; }
+  .empty-state span { font-size: 12px; color: #9a9a9e; }
+
+  .folder-grid-body {
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 16px;
+    overflow-y: auto;
+  }
+  .folder-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 14px;
+    width: 100%;
+  }
+  .photo-thumb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+  }
+  .photo-thumb:hover { background: rgba(0,0,0,0.05); }
+  .photo-thumb img {
+    width: 88px;
+    height: 88px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    display: block;
+  }
+  .thumb-label {
+    font-size: 11px;
+    color: #5a5a5e;
+    text-align: center;
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .photo-window {
+    z-index: 70;
+    width: min(640px, 88vw);
+    height: min(520px, 78vh);
+  }
+  .photo-body { padding: 0; background: #111; }
+  .photo-body img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .dock-wrap {
+    position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 100;
+  }
+  .dock {
+    display: flex; align-items: flex-end; gap: 9px;
+    padding: 8px 12px;
+    background: var(--dock-bg);
+    border: 1px solid rgba(255,255,255,0.66);
+    border-radius: 20px;
+    -webkit-backdrop-filter: blur(24px) saturate(1.75);
+    backdrop-filter: blur(24px) saturate(1.75);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+  }
+  .dock-item {
+    position: relative; width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: default; transition: transform 0.12s ease;
+  }
+  .dock-item:hover { transform: translateY(-8px) scale(1.12); }
+  .dock-icon {
+    width: 42px; height: 42px; border-radius: 10px; overflow: hidden;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+  }
+  .dock-icon img { width: 100%; height: 100%; display: block; object-fit: contain; }
+  .dock-tip {
+    position: absolute; bottom: 56px; left: 50%; transform: translateX(-50%);
+    background: rgba(60,60,60,0.85); color: #fff; font-size: 11px;
+    padding: 3px 8px; border-radius: 6px; white-space: nowrap;
+    opacity: 0; pointer-events: none; transition: opacity 0.12s ease;
+  }
+  .dock-item:hover .dock-tip { opacity: 1; }
+
+  @media (max-width: 640px) {
+    .desktop-icon { width: 68px; }
+    .icon-art { width: 42px; height: 36px; }
+    .icon-label { font-size: 10.5px; max-width: 68px; }
+    .dock-item { width: 36px; height: 36px; }
+    .dock-icon { width: 34px; height: 34px; }
+    .window {
+      left: 5vw;
+      top: 8vh;
+      width: 90vw;
+      height: min(68vh, calc(100dvh - 110px));
+    }
+    .photo-window { width: 90vw; height: min(78vh, calc(100dvh - 110px)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .window { transition: none; }
+    .dock-item { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div id="desktop">
+    <input class="window-toggle" type="checkbox" id="toggle-win-0" aria-label="Показать или скрыть win-0">
+    <input class="window-toggle" type="checkbox" id="toggle-win-1" aria-label="Показать или скрыть win-1">
+    <input class="window-toggle" type="checkbox" id="toggle-win-2" aria-label="Показать или скрыть win-2">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-1" aria-label="Показать или скрыть фото 1">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-2" aria-label="Показать или скрыть фото 2">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-3" aria-label="Показать или скрыть фото 3">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-4" aria-label="Показать или скрыть фото 4">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-5" aria-label="Показать или скрыть фото 5">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-6" aria-label="Показать или скрыть фото 6">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-7" aria-label="Показать или скрыть фото 7">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-8" aria-label="Показать или скрыть фото 8">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-9" aria-label="Показать или скрыть фото 9">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-10" aria-label="Показать или скрыть фото 10">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-11" aria-label="Показать или скрыть фото 11">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-12" aria-label="Показать или скрыть фото 12">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-13" aria-label="Показать или скрыть фото 13">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f2-14" aria-label="Показать или скрыть фото 14">
+    <input class="window-toggle" type="checkbox" id="toggle-win-3" aria-label="Показать или скрыть win-3">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f3-1" aria-label="Показать или скрыть фото 1">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f3-2" aria-label="Показать или скрыть фото 2">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f3-3" aria-label="Показать или скрыть фото 3">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f3-4" aria-label="Показать или скрыть фото 4">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f3-5" aria-label="Показать или скрыть фото 5">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f3-6" aria-label="Показать или скрыть фото 6">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f3-7" aria-label="Показать или скрыть фото 7">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f3-8" aria-label="Показать или скрыть фото 8">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f3-9" aria-label="Показать или скрыть фото 9">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f3-10" aria-label="Показать или скрыть фото 10">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f3-11" aria-label="Показать или скрыть фото 11">
+    <input class="window-toggle" type="checkbox" id="toggle-win-4" aria-label="Показать или скрыть win-4">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f4-1" aria-label="Показать или скрыть фото 1">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f4-2" aria-label="Показать или скрыть фото 2">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f4-3" aria-label="Показать или скрыть фото 3">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f4-4" aria-label="Показать или скрыть фото 4">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f4-5" aria-label="Показать или скрыть фото 5">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f4-6" aria-label="Показать или скрыть фото 6">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f4-7" aria-label="Показать или скрыть фото 7">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f4-8" aria-label="Показать или скрыть фото 8">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f4-9" aria-label="Показать или скрыть фото 9">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f4-10" aria-label="Показать или скрыть фото 10">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f4-11" aria-label="Показать или скрыть фото 11">
+    <input class="window-toggle" type="checkbox" id="toggle-win-5" aria-label="Показать или скрыть win-5">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f5-1" aria-label="Показать или скрыть фото 1">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f5-2" aria-label="Показать или скрыть фото 2">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f5-3" aria-label="Показать или скрыть фото 3">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f5-4" aria-label="Показать или скрыть фото 4">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f5-5" aria-label="Показать или скрыть фото 5">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f5-6" aria-label="Показать или скрыть фото 6">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f5-7" aria-label="Показать или скрыть фото 7">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f5-8" aria-label="Показать или скрыть фото 8">
+    <input class="window-toggle" type="checkbox" id="toggle-win-6" aria-label="Показать или скрыть win-6">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-1" aria-label="Показать или скрыть фото 1">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-2" aria-label="Показать или скрыть фото 2">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-3" aria-label="Показать или скрыть фото 3">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-4" aria-label="Показать или скрыть фото 4">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-5" aria-label="Показать или скрыть фото 5">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-6" aria-label="Показать или скрыть фото 6">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-7" aria-label="Показать или скрыть фото 7">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-8" aria-label="Показать или скрыть фото 8">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-9" aria-label="Показать или скрыть фото 9">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-10" aria-label="Показать или скрыть фото 10">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-11" aria-label="Показать или скрыть фото 11">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-12" aria-label="Показать или скрыть фото 12">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-13" aria-label="Показать или скрыть фото 13">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-14" aria-label="Показать или скрыть фото 14">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-15" aria-label="Показать или скрыть фото 15">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-16" aria-label="Показать или скрыть фото 16">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-17" aria-label="Показать или скрыть фото 17">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f6-18" aria-label="Показать или скрыть фото 18">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f0-1" aria-label="Показать или скрыть pw-f0-1">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f0-2" aria-label="Показать или скрыть pw-f0-2">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f0-3" aria-label="Показать или скрыть pw-f0-3">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f0-4" aria-label="Показать или скрыть pw-f0-4">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f0-5" aria-label="Показать или скрыть pw-f0-5">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f1-1" aria-label="Показать или скрыть pw-f1-1">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f1-2" aria-label="Показать или скрыть pw-f1-2">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f1-3" aria-label="Показать или скрыть pw-f1-3">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f1-4" aria-label="Показать или скрыть pw-f1-4">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f1-5" aria-label="Показать или скрыть pw-f1-5">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f1-6" aria-label="Показать или скрыть pw-f1-6">
+    <input class="window-toggle" type="checkbox" id="toggle-pw-f1-7" aria-label="Показать или скрыть pw-f1-7">
+    
+      <label class="desktop-icon" style="left:6%; top:8%;" for="toggle-win-0" tabindex="0" role="button" aria-label="Открыть папку At work">
+        <div class="icon-art"><svg viewBox="0 0 64 52" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fbody0" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fc4ff"/>
+      <stop offset="1" stop-color="#4a9eff"/>
+    </linearGradient>
+    <linearGradient id="ftab0" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fcdff"/>
+      <stop offset="1" stop-color="#5aa8ff"/>
+    </linearGradient>
+  </defs>
+  <path d="M2 12 C2 9.8 3.8 8 6 8 L24 8 C25.6 8 27 8.8 27.9 10.1 L30 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#ftab0)"/>
+  <path d="M2 17 C2 14.8 3.8 13 6 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#fbody0)"/>
+</svg></div>
+        <div class="icon-label">At work</div>
+      </label>
+      <label class="desktop-icon" style="left:24%; top:34%;" for="toggle-win-1" tabindex="0" role="button" aria-label="Открыть папку 1970-е: трещины Амери...">
+        <div class="icon-art"><svg viewBox="0 0 64 52" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fbody1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fc4ff"/>
+      <stop offset="1" stop-color="#4a9eff"/>
+    </linearGradient>
+    <linearGradient id="ftab1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fcdff"/>
+      <stop offset="1" stop-color="#5aa8ff"/>
+    </linearGradient>
+  </defs>
+  <path d="M2 12 C2 9.8 3.8 8 6 8 L24 8 C25.6 8 27 8.8 27.9 10.1 L30 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#ftab1)"/>
+  <path d="M2 17 C2 14.8 3.8 13 6 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#fbody1)"/>
+</svg></div>
+        <div class="icon-label">1970-е: трещины Амери...</div>
+      </label>
+      <label class="desktop-icon" style="left:4%; top:58%;" for="toggle-win-2" tabindex="0" role="button" aria-label="Открыть папку Пишасао Искусство вандализма">
+        <div class="icon-art"><svg viewBox="0 0 64 52" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fbody2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fc4ff"/>
+      <stop offset="1" stop-color="#4a9eff"/>
+    </linearGradient>
+    <linearGradient id="ftab2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fcdff"/>
+      <stop offset="1" stop-color="#5aa8ff"/>
+    </linearGradient>
+  </defs>
+  <path d="M2 12 C2 9.8 3.8 8 6 8 L24 8 C25.6 8 27 8.8 27.9 10.1 L30 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#ftab2)"/>
+  <path d="M2 17 C2 14.8 3.8 13 6 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#fbody2)"/>
+</svg></div>
+        <div class="icon-label">Пишасао Искусство вандализма</div>
+      </label>
+      <label class="desktop-icon" style="left:46%; top:10%;" for="toggle-win-3" tabindex="0" role="button" aria-label="Открыть папку Запечатленное и опубликованное">
+        <div class="icon-art"><svg viewBox="0 0 64 52" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fbody3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fc4ff"/>
+      <stop offset="1" stop-color="#4a9eff"/>
+    </linearGradient>
+    <linearGradient id="ftab3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fcdff"/>
+      <stop offset="1" stop-color="#5aa8ff"/>
+    </linearGradient>
+  </defs>
+  <path d="M2 12 C2 9.8 3.8 8 6 8 L24 8 C25.6 8 27 8.8 27.9 10.1 L30 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#ftab3)"/>
+  <path d="M2 17 C2 14.8 3.8 13 6 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#fbody3)"/>
+</svg></div>
+        <div class="icon-label">Запечатленное и опубликованное</div>
+      </label>
+      <label class="desktop-icon" style="left:63%; top:46%;" for="toggle-win-4" tabindex="0" role="button" aria-label="Открыть папку В поисках вершины: истины">
+        <div class="icon-art"><svg viewBox="0 0 64 52" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fbody4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fc4ff"/>
+      <stop offset="1" stop-color="#4a9eff"/>
+    </linearGradient>
+    <linearGradient id="ftab4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fcdff"/>
+      <stop offset="1" stop-color="#5aa8ff"/>
+    </linearGradient>
+  </defs>
+  <path d="M2 12 C2 9.8 3.8 8 6 8 L24 8 C25.6 8 27 8.8 27.9 10.1 L30 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#ftab4)"/>
+  <path d="M2 17 C2 14.8 3.8 13 6 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#fbody4)"/>
+</svg></div>
+        <div class="icon-label">В поисках вершины: истины</div>
+      </label>
+      <label class="desktop-icon" style="left:82%; top:12%;" for="toggle-win-5" tabindex="0" role="button" aria-label="Открыть папку (OS)+(OD) — айдентика">
+        <div class="icon-art"><svg viewBox="0 0 64 52" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fbody5" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fc4ff"/>
+      <stop offset="1" stop-color="#4a9eff"/>
+    </linearGradient>
+    <linearGradient id="ftab5" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fcdff"/>
+      <stop offset="1" stop-color="#5aa8ff"/>
+    </linearGradient>
+  </defs>
+  <path d="M2 12 C2 9.8 3.8 8 6 8 L24 8 C25.6 8 27 8.8 27.9 10.1 L30 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#ftab5)"/>
+  <path d="M2 17 C2 14.8 3.8 13 6 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#fbody5)"/>
+</svg></div>
+        <div class="icon-label">(OS)+(OD) — айдентика</div>
+      </label>
+      <label class="desktop-icon" style="left:86%; top:62%;" for="toggle-win-6" tabindex="0" role="button" aria-label="Открыть папку cipó — айдентика для бр...">
+        <div class="icon-art"><svg viewBox="0 0 64 52" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fbody6" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fc4ff"/>
+      <stop offset="1" stop-color="#4a9eff"/>
+    </linearGradient>
+    <linearGradient id="ftab6" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fcdff"/>
+      <stop offset="1" stop-color="#5aa8ff"/>
+    </linearGradient>
+  </defs>
+  <path d="M2 12 C2 9.8 3.8 8 6 8 L24 8 C25.6 8 27 8.8 27.9 10.1 L30 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#ftab6)"/>
+  <path d="M2 17 C2 14.8 3.8 13 6 13 L58 13 C60.2 13 62 14.8 62 17 L62 44 C62 46.2 60.2 48 58 48 L6 48 C3.8 48 2 46.2 2 44 Z" fill="url(#fbody6)"/>
+</svg></div>
+        <div class="icon-label">cipó — айдентика для бр...</div>
+      </label>
+    
+      <div class="window" id="win-0" style="--wx: 8%; --wy: 10%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-win-0" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">At work</div>
+        </div>
+        <div class="wbody folder-grid-body"><div class="folder-grid"><label class="photo-thumb" for="toggle-pw-f0-1"><img src="assets/5b07f859297cae19.jpg" alt="Фото 1" /><div class="thumb-label">Фото 1</div></label><label class="photo-thumb" for="toggle-pw-f0-2"><img src="assets/4983dc6882ff8aa7.jpg" alt="Фото 2" /><div class="thumb-label">Фото 2</div></label><label class="photo-thumb" for="toggle-pw-f0-3"><img src="assets/3f86a5e223990746.jpg" alt="Фото 3" /><div class="thumb-label">Фото 3</div></label><label class="photo-thumb" for="toggle-pw-f0-4"><img src="assets/979cf3c2444822b1.jpg" alt="Фото 4" /><div class="thumb-label">Фото 4</div></label><label class="photo-thumb" for="toggle-pw-f0-5"><img src="assets/a9fa7641c35971c9.jpg" alt="Фото 5" /><div class="thumb-label">Фото 5</div></label></div></div>
+      </div>
+      <div class="window" id="win-1" style="--wx: 11%; --wy: 14%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-win-1" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">1970-е: трещины Амери...</div>
+        </div>
+        <div class="wbody folder-grid-body"><div class="folder-grid"><label class="photo-thumb" for="toggle-pw-f1-1"><img src="assets/3a0cfa75f2dfb6a8.jpg" alt="Фото 1" /><div class="thumb-label">Фото 1</div></label><label class="photo-thumb" for="toggle-pw-f1-2"><img src="assets/d00acdd0b3069785.jpg" alt="Фото 2" /><div class="thumb-label">Фото 2</div></label><label class="photo-thumb" for="toggle-pw-f1-3"><img src="assets/eb2d4d2354b86c32.jpg" alt="Фото 3" /><div class="thumb-label">Фото 3</div></label><label class="photo-thumb" for="toggle-pw-f1-4"><img src="assets/687bf7c43e7877e4.jpg" alt="Фото 4" /><div class="thumb-label">Фото 4</div></label><label class="photo-thumb" for="toggle-pw-f1-5"><img src="assets/94fc8733feda242d.jpg" alt="Фото 5" /><div class="thumb-label">Фото 5</div></label><label class="photo-thumb" for="toggle-pw-f1-6"><img src="assets/ba86dc98f70b03c9.jpg" alt="Фото 6" /><div class="thumb-label">Фото 6</div></label><label class="photo-thumb" for="toggle-pw-f1-7"><img src="assets/18368489d3ca295d.jpg" alt="Фото 7" /><div class="thumb-label">Фото 7</div></label></div></div>
+      </div>
+      <div class="window" id="win-2" style="--wx: 14%; --wy: 18%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-win-2" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Пишасао Искусство вандализма</div>
+        </div>
+        <div class="wbody folder-grid-body"><div class="folder-grid"><label class="photo-thumb" for="toggle-pw-f2-1"><img src="assets/a3c08eb0b76e7352.jpg" alt="Фото 1" /><div class="thumb-label">Фото 1</div></label><label class="photo-thumb" for="toggle-pw-f2-2"><img src="assets/3a960addab82a3f3.jpg" alt="Фото 2" /><div class="thumb-label">Фото 2</div></label><label class="photo-thumb" for="toggle-pw-f2-3"><img src="assets/c1f2438c9b4d5aad.jpg" alt="Фото 3" /><div class="thumb-label">Фото 3</div></label><label class="photo-thumb" for="toggle-pw-f2-4"><img src="assets/b7d523cd17cccd5f.jpg" alt="Фото 4" /><div class="thumb-label">Фото 4</div></label><label class="photo-thumb" for="toggle-pw-f2-5"><img src="assets/3f17a89264ad29a7.jpg" alt="Фото 5" /><div class="thumb-label">Фото 5</div></label><label class="photo-thumb" for="toggle-pw-f2-6"><img src="assets/779822712d8551da.jpg" alt="Фото 6" /><div class="thumb-label">Фото 6</div></label><label class="photo-thumb" for="toggle-pw-f2-7"><img src="assets/2f0650f78b4c4de3.jpg" alt="Фото 7" /><div class="thumb-label">Фото 7</div></label><label class="photo-thumb" for="toggle-pw-f2-8"><img src="assets/0a3f5dce808140f6.jpg" alt="Фото 8" /><div class="thumb-label">Фото 8</div></label><label class="photo-thumb" for="toggle-pw-f2-9"><img src="assets/a83b9d137f77026e.jpg" alt="Фото 9" /><div class="thumb-label">Фото 9</div></label><label class="photo-thumb" for="toggle-pw-f2-10"><img src="assets/7d695fe7a92404ab.jpg" alt="Фото 10" /><div class="thumb-label">Фото 10</div></label><label class="photo-thumb" for="toggle-pw-f2-11"><img src="assets/c6428d2ad643ca6a.jpg" alt="Фото 11" /><div class="thumb-label">Фото 11</div></label><label class="photo-thumb" for="toggle-pw-f2-12"><img src="assets/99d922ecc0e28c6e.jpg" alt="Фото 12" /><div class="thumb-label">Фото 12</div></label><label class="photo-thumb" for="toggle-pw-f2-13"><img src="assets/1ac092699e318847.jpg" alt="Фото 13" /><div class="thumb-label">Фото 13</div></label><label class="photo-thumb" for="toggle-pw-f2-14"><img src="assets/66755c50c4a469aa.jpg" alt="Фото 14" /><div class="thumb-label">Фото 14</div></label></div></div>
+      </div>
+      <div class="window" id="win-3" style="--wx: 17%; --wy: 10%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-win-3" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Запечатленное и опубликованное</div>
+        </div>
+        <div class="wbody folder-grid-body"><div class="folder-grid"><label class="photo-thumb" for="toggle-pw-f3-1"><img src="assets/a24e7b4b068bd9fd.jpg" alt="Фото 1" /><div class="thumb-label">Фото 1</div></label><label class="photo-thumb" for="toggle-pw-f3-2"><img src="assets/23fbff8da3fdeb25.jpg" alt="Фото 2" /><div class="thumb-label">Фото 2</div></label><label class="photo-thumb" for="toggle-pw-f3-3"><img src="assets/cd5da59d862a8f5c.jpg" alt="Фото 3" /><div class="thumb-label">Фото 3</div></label><label class="photo-thumb" for="toggle-pw-f3-4"><img src="assets/bdbbca77172359c5.jpg" alt="Фото 4" /><div class="thumb-label">Фото 4</div></label><label class="photo-thumb" for="toggle-pw-f3-5"><img src="assets/87e369b605c9c845.jpg" alt="Фото 5" /><div class="thumb-label">Фото 5</div></label><label class="photo-thumb" for="toggle-pw-f3-6"><img src="assets/3d1a1e49c5a35a76.jpg" alt="Фото 6" /><div class="thumb-label">Фото 6</div></label><label class="photo-thumb" for="toggle-pw-f3-7"><img src="assets/8437bfc722973534.jpg" alt="Фото 7" /><div class="thumb-label">Фото 7</div></label><label class="photo-thumb" for="toggle-pw-f3-8"><img src="assets/87f9e4c556fb777d.jpg" alt="Фото 8" /><div class="thumb-label">Фото 8</div></label><label class="photo-thumb" for="toggle-pw-f3-9"><img src="assets/c59232686abd5b23.jpg" alt="Фото 9" /><div class="thumb-label">Фото 9</div></label><label class="photo-thumb" for="toggle-pw-f3-10"><img src="assets/38828cfc9f79ce9b.jpg" alt="Фото 10" /><div class="thumb-label">Фото 10</div></label><label class="photo-thumb" for="toggle-pw-f3-11"><img src="assets/6d6cd7351d5e65f6.jpg" alt="Фото 11" /><div class="thumb-label">Фото 11</div></label></div></div>
+      </div>
+      <div class="window" id="win-4" style="--wx: 8%; --wy: 14%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-win-4" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">В поисках вершины: истины</div>
+        </div>
+        <div class="wbody folder-grid-body"><div class="folder-grid"><label class="photo-thumb" for="toggle-pw-f4-1"><img src="assets/e0266ea4eb2fe1c8.jpg" alt="Фото 1" /><div class="thumb-label">Фото 1</div></label><label class="photo-thumb" for="toggle-pw-f4-2"><img src="assets/9c64b0500ba790bd.jpg" alt="Фото 2" /><div class="thumb-label">Фото 2</div></label><label class="photo-thumb" for="toggle-pw-f4-3"><img src="assets/afd3f4ef673f6b5e.jpg" alt="Фото 3" /><div class="thumb-label">Фото 3</div></label><label class="photo-thumb" for="toggle-pw-f4-4"><img src="assets/41421ef55a80e48e.jpg" alt="Фото 4" /><div class="thumb-label">Фото 4</div></label><label class="photo-thumb" for="toggle-pw-f4-5"><img src="assets/818711d7de983381.jpg" alt="Фото 5" /><div class="thumb-label">Фото 5</div></label><label class="photo-thumb" for="toggle-pw-f4-6"><img src="assets/991d7a777a0f331f.jpg" alt="Фото 6" /><div class="thumb-label">Фото 6</div></label><label class="photo-thumb" for="toggle-pw-f4-7"><img src="assets/6d61c3642e588b1b.jpg" alt="Фото 7" /><div class="thumb-label">Фото 7</div></label><label class="photo-thumb" for="toggle-pw-f4-8"><img src="assets/6a27e33b363705d2.jpg" alt="Фото 8" /><div class="thumb-label">Фото 8</div></label><label class="photo-thumb" for="toggle-pw-f4-9"><img src="assets/7f511451b7ce8ce0.jpg" alt="Фото 9" /><div class="thumb-label">Фото 9</div></label><label class="photo-thumb" for="toggle-pw-f4-10"><img src="assets/7c2c3119e69e994b.jpg" alt="Фото 10" /><div class="thumb-label">Фото 10</div></label><label class="photo-thumb" for="toggle-pw-f4-11"><img src="assets/f4170f526223f42e.jpg" alt="Фото 11" /><div class="thumb-label">Фото 11</div></label></div></div>
+      </div>
+      <div class="window" id="win-5" style="--wx: 11%; --wy: 18%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-win-5" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">(OS)+(OD) — айдентика</div>
+        </div>
+        <div class="wbody folder-grid-body"><div class="folder-grid"><label class="photo-thumb" for="toggle-pw-f5-1"><img src="assets/c058d44f081fcd40.jpg" alt="Фото 1" /><div class="thumb-label">Фото 1</div></label><label class="photo-thumb" for="toggle-pw-f5-2"><img src="assets/4355b6a8ac753aad.jpg" alt="Фото 2" /><div class="thumb-label">Фото 2</div></label><label class="photo-thumb" for="toggle-pw-f5-3"><img src="assets/7fbbc9c3fcffbe3f.jpg" alt="Фото 3" /><div class="thumb-label">Фото 3</div></label><label class="photo-thumb" for="toggle-pw-f5-4"><img src="assets/f6ea379361ea6250.jpg" alt="Фото 4" /><div class="thumb-label">Фото 4</div></label><label class="photo-thumb" for="toggle-pw-f5-5"><img src="assets/d0a7a68ca70f0f5c.jpg" alt="Фото 5" /><div class="thumb-label">Фото 5</div></label><label class="photo-thumb" for="toggle-pw-f5-6"><img src="assets/27c09d2dd8b3b3c0.jpg" alt="Фото 6" /><div class="thumb-label">Фото 6</div></label><label class="photo-thumb" for="toggle-pw-f5-7"><img src="assets/c6654d6f2e05389f.jpg" alt="Фото 7" /><div class="thumb-label">Фото 7</div></label><label class="photo-thumb" for="toggle-pw-f5-8"><img src="assets/38ef4acd9468b0d3.jpg" alt="Фото 8" /><div class="thumb-label">Фото 8</div></label></div></div>
+      </div>
+      <div class="window" id="win-6" style="--wx: 14%; --wy: 10%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-win-6" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">cipó — айдентика для бр...</div>
+        </div>
+        <div class="wbody folder-grid-body"><div class="folder-grid"><label class="photo-thumb" for="toggle-pw-f6-1"><img src="assets/82bdb29667d455bc.jpg" alt="Фото 1" /><div class="thumb-label">Фото 1</div></label><label class="photo-thumb" for="toggle-pw-f6-2"><img src="assets/65b5ee2be7b20b63.jpg" alt="Фото 2" /><div class="thumb-label">Фото 2</div></label><label class="photo-thumb" for="toggle-pw-f6-3"><img src="assets/d98df444a2e83394.jpg" alt="Фото 3" /><div class="thumb-label">Фото 3</div></label><label class="photo-thumb" for="toggle-pw-f6-4"><img src="assets/51feac63923abe47.jpg" alt="Фото 4" /><div class="thumb-label">Фото 4</div></label><label class="photo-thumb" for="toggle-pw-f6-5"><img src="assets/863bbc2d9da8907c.jpg" alt="Фото 5" /><div class="thumb-label">Фото 5</div></label><label class="photo-thumb" for="toggle-pw-f6-6"><img src="assets/bc75f14823f1d249.jpg" alt="Фото 6" /><div class="thumb-label">Фото 6</div></label><label class="photo-thumb" for="toggle-pw-f6-7"><img src="assets/7eb1ba2be4449183.jpg" alt="Фото 7" /><div class="thumb-label">Фото 7</div></label><label class="photo-thumb" for="toggle-pw-f6-8"><img src="assets/ceabd2666a27fe05.jpg" alt="Фото 8" /><div class="thumb-label">Фото 8</div></label><label class="photo-thumb" for="toggle-pw-f6-9"><img src="assets/5ac6ad7bc264ed09.jpg" alt="Фото 9" /><div class="thumb-label">Фото 9</div></label><label class="photo-thumb" for="toggle-pw-f6-10"><img src="assets/19c23f1f2c4ccb2c.jpg" alt="Фото 10" /><div class="thumb-label">Фото 10</div></label><label class="photo-thumb" for="toggle-pw-f6-11"><img src="assets/07d05ac9010b9478.jpg" alt="Фото 11" /><div class="thumb-label">Фото 11</div></label><label class="photo-thumb" for="toggle-pw-f6-12"><img src="assets/d4366882ea45f7e7.jpg" alt="Фото 12" /><div class="thumb-label">Фото 12</div></label><label class="photo-thumb" for="toggle-pw-f6-13"><img src="assets/7c92c946d62d7c4b.jpg" alt="Фото 13" /><div class="thumb-label">Фото 13</div></label><label class="photo-thumb" for="toggle-pw-f6-14"><img src="assets/44800c646b9485fa.jpg" alt="Фото 14" /><div class="thumb-label">Фото 14</div></label><label class="photo-thumb" for="toggle-pw-f6-15"><img src="assets/73099f0b2c1af6d7.jpg" alt="Фото 15" /><div class="thumb-label">Фото 15</div></label><label class="photo-thumb" for="toggle-pw-f6-16"><img src="assets/84b42feeebdef25c.jpg" alt="Фото 16" /><div class="thumb-label">Фото 16</div></label><label class="photo-thumb" for="toggle-pw-f6-17"><img src="assets/b930f7d44a0b95cd.jpg" alt="Фото 17" /><div class="thumb-label">Фото 17</div></label><label class="photo-thumb" for="toggle-pw-f6-18"><img src="assets/4a798a55e5258c09.jpg" alt="Фото 18" /><div class="thumb-label">Фото 18</div></label></div></div>
+      </div>
+      <div class="window photo-window" id="pw-f0-1" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f0-1" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 1</div>
+        </div>
+        <div class="wbody photo-body">
+          <img src="assets/5b07f859297cae19.jpg" alt="Фото 1" />
+        </div>
+      </div>
+      <div class="window photo-window" id="pw-f0-2" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f0-2" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 2</div>
+        </div>
+        <div class="wbody photo-body">
+          <img src="assets/4983dc6882ff8aa7.jpg" alt="Фото 2" />
+        </div>
+      </div>
+      <div class="window photo-window" id="pw-f0-3" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f0-3" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 3</div>
+        </div>
+        <div class="wbody photo-body">
+          <img src="assets/3f86a5e223990746.jpg" alt="Фото 3" />
+        </div>
+      </div>
+      <div class="window photo-window" id="pw-f0-4" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f0-4" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 4</div>
+        </div>
+        <div class="wbody photo-body">
+          <img src="assets/979cf3c2444822b1.jpg" alt="Фото 4" />
+        </div>
+      </div>
+      <div class="window photo-window" id="pw-f0-5" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f0-5" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 5</div>
+        </div>
+        <div class="wbody photo-body">
+          <img src="assets/a9fa7641c35971c9.jpg" alt="Фото 5" />
+        </div>
+      </div>
+      <div class="window photo-window" id="pw-f1-1" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f1-1" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 1</div>
+        </div>
+        <div class="wbody photo-body">
+          <img src="assets/3a0cfa75f2dfb6a8.jpg" alt="Фото 1" />
+        </div>
+      </div>
+      <div class="window photo-window" id="pw-f1-2" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f1-2" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 2</div>
+        </div>
+        <div class="wbody photo-body">
+          <img src="assets/d00acdd0b3069785.jpg" alt="Фото 2" />
+        </div>
+      </div>
+      <div class="window photo-window" id="pw-f1-3" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f1-3" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 3</div>
+        </div>
+        <div class="wbody photo-body">
+          <img src="assets/eb2d4d2354b86c32.jpg" alt="Фото 3" />
+        </div>
+      </div>
+      <div class="window photo-window" id="pw-f1-4" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f1-4" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 4</div>
+        </div>
+        <div class="wbody photo-body">
+          <img src="assets/687bf7c43e7877e4.jpg" alt="Фото 4" />
+        </div>
+      </div>
+      <div class="window photo-window" id="pw-f1-5" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f1-5" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 5</div>
+        </div>
+        <div class="wbody photo-body">
+          <img src="assets/94fc8733feda242d.jpg" alt="Фото 5" />
+        </div>
+      </div>
+      <div class="window photo-window" id="pw-f1-6" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f1-6" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 6</div>
+        </div>
+        <div class="wbody photo-body">
+          <img src="assets/ba86dc98f70b03c9.jpg" alt="Фото 6" />
+        </div>
+      </div>
+      <div class="window photo-window" id="pw-f1-7" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f1-7" aria-label="Закрыть"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 7</div>
+        </div>
+        <div class="wbody photo-body">
+          <img src="assets/18368489d3ca295d.jpg" alt="Фото 7" />
+        </div>
+      </div>
+
+      <div class="window photo-window" id="pw-f2-1" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f2-1" aria-label="Закрыть фото 1"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 1</div>
+        </div>
+        <div class="wbody photo-body"><img src="assets/a3c08eb0b76e7352.jpg" alt="Фото 1" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f2-2" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f2-2" aria-label="Закрыть фото 2"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 2</div>
+        </div>
+        <div class="wbody photo-body"><img src="assets/3a960addab82a3f3.jpg" alt="Фото 2" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f2-3" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f2-3" aria-label="Закрыть фото 3"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 3</div>
+        </div>
+        <div class="wbody photo-body"><img src="assets/c1f2438c9b4d5aad.jpg" alt="Фото 3" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f2-4" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f2-4" aria-label="Закрыть фото 4"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 4</div>
+        </div>
+        <div class="wbody photo-body"><img src="assets/b7d523cd17cccd5f.jpg" alt="Фото 4" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f2-5" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f2-5" aria-label="Закрыть фото 5"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 5</div>
+        </div>
+        <div class="wbody photo-body"><img src="assets/3f17a89264ad29a7.jpg" alt="Фото 5" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f2-6" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f2-6" aria-label="Закрыть фото 6"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 6</div>
+        </div>
+        <div class="wbody photo-body"><img src="assets/779822712d8551da.jpg" alt="Фото 6" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f2-7" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f2-7" aria-label="Закрыть фото 7"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 7</div>
+        </div>
+        <div class="wbody photo-body"><img src="assets/2f0650f78b4c4de3.jpg" alt="Фото 7" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f2-8" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f2-8" aria-label="Закрыть фото 8"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 8</div>
+        </div>
+        <div class="wbody photo-body"><img src="assets/0a3f5dce808140f6.jpg" alt="Фото 8" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f2-9" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f2-9" aria-label="Закрыть фото 9"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 9</div>
+        </div>
+        <div class="wbody photo-body"><img src="assets/a83b9d137f77026e.jpg" alt="Фото 9" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f2-10" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar">
+          <div class="traffic">
+            <label class="dot dot-red" for="toggle-pw-f2-10" aria-label="Закрыть фото 10"><span class="glyph">×</span></label>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="wtitle">Фото 10</div>
+        </div>
+        <div class="wbody photo-body"><img src="assets/7d695fe7a92404ab.jpg" alt="Фото 10" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f2-11" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f2-11" aria-label="Закрыть фото 11"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 11</div></div>
+        <div class="wbody photo-body"><img src="assets/c6428d2ad643ca6a.jpg" alt="Фото 11" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f2-12" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f2-12" aria-label="Закрыть фото 12"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 12</div></div>
+        <div class="wbody photo-body"><img src="assets/99d922ecc0e28c6e.jpg" alt="Фото 12" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f2-13" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f2-13" aria-label="Закрыть фото 13"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 13</div></div>
+        <div class="wbody photo-body"><img src="assets/1ac092699e318847.jpg" alt="Фото 13" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f2-14" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f2-14" aria-label="Закрыть фото 14"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 14</div></div>
+        <div class="wbody photo-body"><img src="assets/66755c50c4a469aa.jpg" alt="Фото 14" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f3-1" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f3-1" aria-label="Закрыть фото 1"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 1</div></div>
+        <div class="wbody photo-body"><img src="assets/a24e7b4b068bd9fd.jpg" alt="Фото 1" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f3-2" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f3-2" aria-label="Закрыть фото 2"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 2</div></div>
+        <div class="wbody photo-body"><img src="assets/23fbff8da3fdeb25.jpg" alt="Фото 2" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f3-3" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f3-3" aria-label="Закрыть фото 3"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 3</div></div>
+        <div class="wbody photo-body"><img src="assets/cd5da59d862a8f5c.jpg" alt="Фото 3" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f3-4" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f3-4" aria-label="Закрыть фото 4"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 4</div></div>
+        <div class="wbody photo-body"><img src="assets/bdbbca77172359c5.jpg" alt="Фото 4" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f3-5" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f3-5" aria-label="Закрыть фото 5"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 5</div></div>
+        <div class="wbody photo-body"><img src="assets/87e369b605c9c845.jpg" alt="Фото 5" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f3-6" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f3-6" aria-label="Закрыть фото 6"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 6</div></div>
+        <div class="wbody photo-body"><img src="assets/3d1a1e49c5a35a76.jpg" alt="Фото 6" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f3-7" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f3-7" aria-label="Закрыть фото 7"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 7</div></div>
+        <div class="wbody photo-body"><img src="assets/8437bfc722973534.jpg" alt="Фото 7" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f3-8" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f3-8" aria-label="Закрыть фото 8"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 8</div></div>
+        <div class="wbody photo-body"><img src="assets/87f9e4c556fb777d.jpg" alt="Фото 8" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f3-9" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f3-9" aria-label="Закрыть фото 9"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 9</div></div>
+        <div class="wbody photo-body"><img src="assets/c59232686abd5b23.jpg" alt="Фото 9" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f3-10" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f3-10" aria-label="Закрыть фото 10"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 10</div></div>
+        <div class="wbody photo-body"><img src="assets/38828cfc9f79ce9b.jpg" alt="Фото 10" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f3-11" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f3-11" aria-label="Закрыть фото 11"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 11</div></div>
+        <div class="wbody photo-body"><img src="assets/6d6cd7351d5e65f6.jpg" alt="Фото 11" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f4-1" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f4-1" aria-label="Закрыть фото 1"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 1</div></div>
+        <div class="wbody photo-body"><img src="assets/e0266ea4eb2fe1c8.jpg" alt="Фото 1" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f4-2" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f4-2" aria-label="Закрыть фото 2"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 2</div></div>
+        <div class="wbody photo-body"><img src="assets/9c64b0500ba790bd.jpg" alt="Фото 2" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f4-3" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f4-3" aria-label="Закрыть фото 3"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 3</div></div>
+        <div class="wbody photo-body"><img src="assets/afd3f4ef673f6b5e.jpg" alt="Фото 3" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f4-4" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f4-4" aria-label="Закрыть фото 4"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 4</div></div>
+        <div class="wbody photo-body"><img src="assets/41421ef55a80e48e.jpg" alt="Фото 4" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f4-5" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f4-5" aria-label="Закрыть фото 5"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 5</div></div>
+        <div class="wbody photo-body"><img src="assets/818711d7de983381.jpg" alt="Фото 5" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f4-6" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f4-6" aria-label="Закрыть фото 6"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 6</div></div>
+        <div class="wbody photo-body"><img src="assets/991d7a777a0f331f.jpg" alt="Фото 6" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f4-7" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f4-7" aria-label="Закрыть фото 7"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 7</div></div>
+        <div class="wbody photo-body"><img src="assets/6d61c3642e588b1b.jpg" alt="Фото 7" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f4-8" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f4-8" aria-label="Закрыть фото 8"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 8</div></div>
+        <div class="wbody photo-body"><img src="assets/6a27e33b363705d2.jpg" alt="Фото 8" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f4-9" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f4-9" aria-label="Закрыть фото 9"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 9</div></div>
+        <div class="wbody photo-body"><img src="assets/7f511451b7ce8ce0.jpg" alt="Фото 9" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f4-10" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f4-10" aria-label="Закрыть фото 10"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 10</div></div>
+        <div class="wbody photo-body"><img src="assets/7c2c3119e69e994b.jpg" alt="Фото 10" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f4-11" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f4-11" aria-label="Закрыть фото 11"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 11</div></div>
+        <div class="wbody photo-body"><img src="assets/f4170f526223f42e.jpg" alt="Фото 11" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f5-1" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f5-1" aria-label="Закрыть фото 1"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 1</div></div>
+        <div class="wbody photo-body"><img src="assets/c058d44f081fcd40.jpg" alt="Фото 1" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f5-2" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f5-2" aria-label="Закрыть фото 2"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 2</div></div>
+        <div class="wbody photo-body"><img src="assets/4355b6a8ac753aad.jpg" alt="Фото 2" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f5-3" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f5-3" aria-label="Закрыть фото 3"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 3</div></div>
+        <div class="wbody photo-body"><img src="assets/7fbbc9c3fcffbe3f.jpg" alt="Фото 3" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f5-4" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f5-4" aria-label="Закрыть фото 4"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 4</div></div>
+        <div class="wbody photo-body"><img src="assets/f6ea379361ea6250.jpg" alt="Фото 4" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f5-5" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f5-5" aria-label="Закрыть фото 5"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 5</div></div>
+        <div class="wbody photo-body"><img src="assets/d0a7a68ca70f0f5c.jpg" alt="Фото 5" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f5-6" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f5-6" aria-label="Закрыть фото 6"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 6</div></div>
+        <div class="wbody photo-body"><img src="assets/27c09d2dd8b3b3c0.jpg" alt="Фото 6" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f5-7" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f5-7" aria-label="Закрыть фото 7"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 7</div></div>
+        <div class="wbody photo-body"><img src="assets/c6654d6f2e05389f.jpg" alt="Фото 7" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f5-8" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f5-8" aria-label="Закрыть фото 8"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 8</div></div>
+        <div class="wbody photo-body"><img src="assets/38ef4acd9468b0d3.jpg" alt="Фото 8" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f6-1" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-1" aria-label="Закрыть фото 1"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 1</div></div>
+        <div class="wbody photo-body"><img src="assets/82bdb29667d455bc.jpg" alt="Фото 1" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f6-2" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-2" aria-label="Закрыть фото 2"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 2</div></div>
+        <div class="wbody photo-body"><img src="assets/65b5ee2be7b20b63.jpg" alt="Фото 2" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f6-3" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-3" aria-label="Закрыть фото 3"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 3</div></div>
+        <div class="wbody photo-body"><img src="assets/d98df444a2e83394.jpg" alt="Фото 3" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f6-4" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-4" aria-label="Закрыть фото 4"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 4</div></div>
+        <div class="wbody photo-body"><img src="assets/51feac63923abe47.jpg" alt="Фото 4" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f6-5" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-5" aria-label="Закрыть фото 5"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 5</div></div>
+        <div class="wbody photo-body"><img src="assets/863bbc2d9da8907c.jpg" alt="Фото 5" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f6-6" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-6" aria-label="Закрыть фото 6"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 6</div></div>
+        <div class="wbody photo-body"><img src="assets/bc75f14823f1d249.jpg" alt="Фото 6" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f6-7" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-7" aria-label="Закрыть фото 7"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 7</div></div>
+        <div class="wbody photo-body"><img src="assets/7eb1ba2be4449183.jpg" alt="Фото 7" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f6-8" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-8" aria-label="Закрыть фото 8"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 8</div></div>
+        <div class="wbody photo-body"><img src="assets/ceabd2666a27fe05.jpg" alt="Фото 8" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f6-9" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-9" aria-label="Закрыть фото 9"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 9</div></div>
+        <div class="wbody photo-body"><img src="assets/5ac6ad7bc264ed09.jpg" alt="Фото 9" /></div>
+      </div>
+      <div class="window photo-window" id="pw-f6-10" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-10" aria-label="Закрыть фото 10"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 10</div></div>
+        <div class="wbody photo-body"><img src="assets/19c23f1f2c4ccb2c.jpg" alt="Фото 10" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f6-11" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-11" aria-label="Закрыть фото 11"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 11</div></div>
+        <div class="wbody photo-body"><img src="assets/07d05ac9010b9478.jpg" alt="Фото 11" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f6-12" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-12" aria-label="Закрыть фото 12"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 12</div></div>
+        <div class="wbody photo-body"><img src="assets/d4366882ea45f7e7.jpg" alt="Фото 12" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f6-13" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-13" aria-label="Закрыть фото 13"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 13</div></div>
+        <div class="wbody photo-body"><img src="assets/7c92c946d62d7c4b.jpg" alt="Фото 13" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f6-14" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-14" aria-label="Закрыть фото 14"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 14</div></div>
+        <div class="wbody photo-body"><img src="assets/44800c646b9485fa.jpg" alt="Фото 14" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f6-15" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-15" aria-label="Закрыть фото 15"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 15</div></div>
+        <div class="wbody photo-body"><img src="assets/73099f0b2c1af6d7.jpg" alt="Фото 15" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f6-16" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-16" aria-label="Закрыть фото 16"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 16</div></div>
+        <div class="wbody photo-body"><img src="assets/84b42feeebdef25c.jpg" alt="Фото 16" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f6-17" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-17" aria-label="Закрыть фото 17"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 17</div></div>
+        <div class="wbody photo-body"><img src="assets/b930f7d44a0b95cd.jpg" alt="Фото 17" /></div>
+      </div>
+
+      <div class="window photo-window" id="pw-f6-18" style="--wx: 12%; --wy: 8%;">
+        <div class="titlebar"><div class="traffic">
+          <label class="dot dot-red" for="toggle-pw-f6-18" aria-label="Закрыть фото 18"><span class="glyph">×</span></label>
+          <span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+        </div><div class="wtitle">Фото 18</div></div>
+        <div class="wbody photo-body"><img src="assets/4a798a55e5258c09.jpg" alt="Фото 18" /></div>
+      </div>
+
+    <div class="dock-wrap">
+      <div class="dock">
+        <div class="dock-item" data-name="Finder">
+          <div class="dock-icon"><img src="assets/3163866381a6fcd9.webp" alt="" loading="eager" decoding="async"></div>
+          <span class="dock-tip">Finder</span>
+        </div>
+        <div class="dock-item" data-name="Safari">
+          <div class="dock-icon"><img src="assets/79f0c3e42c8b9168.webp" alt="" loading="eager" decoding="async"></div>
+          <span class="dock-tip">Safari</span>
+        </div>
+        <div class="dock-item" data-name="Perplexity">
+          <div class="dock-icon"><img src="assets/d95b3a9e15532f85.webp" alt="" loading="eager" decoding="async"></div>
+          <span class="dock-tip">Perplexity</span>
+        </div>
+        <div class="dock-item" data-name="Music">
+          <div class="dock-icon"><img src="assets/caccf011a4fecedf.webp" alt="" loading="eager" decoding="async"></div>
+          <span class="dock-tip">Music</span>
+        </div>
+        <div class="dock-item" data-name="Claude">
+          <div class="dock-icon"><img src="assets/68ff1caf460f8b60.jpg" alt="" loading="eager" decoding="async"></div>
+          <span class="dock-tip">Claude</span>
+        </div>
+        <div class="dock-item" data-name="YouTube">
+          <div class="dock-icon"><img src="assets/0901afe4ed514ac2.webp" alt="" loading="eager" decoding="async"></div>
+          <span class="dock-tip">YouTube</span>
+        </div>
+        <div class="dock-item" data-name="ChatGPT">
+          <div class="dock-icon"><img src="assets/2b0a44270f40af19.jpg" alt="" loading="eager" decoding="async"></div>
+          <span class="dock-tip">ChatGPT</span>
+        </div>
+        <div class="dock-item" data-name="FaceTime">
+          <div class="dock-icon"><img src="assets/453af04a49f1ba33.webp" alt="" loading="eager" decoding="async"></div>
+          <span class="dock-tip">FaceTime</span>
+        </div>
+        <div class="dock-item" data-name="Заметки">
+          <div class="dock-icon"><img src="assets/cfd5abc860f95a64.webp" alt="" loading="eager" decoding="async"></div>
+          <span class="dock-tip">Заметки</span>
+        </div>
+        <div class="dock-item" data-name="App Store">
+          <div class="dock-icon"><img src="assets/ac60dcfe454525ba.webp" alt="" loading="eager" decoding="async"></div>
+          <span class="dock-tip">App Store</span>
+        </div>
+        <div class="dock-item" data-name="Настройки">
+          <div class="dock-icon"><img src="assets/e1741adb096625fe.webp" alt="" loading="eager" decoding="async"></div>
+          <span class="dock-tip">Настройки</span>
+        </div>
+        <div class="dock-item" data-name="Корзина">
+          <div class="dock-icon"><img src="assets/7730f629c3eb83eb.png" alt="" loading="eager" decoding="async"></div>
+          <span class="dock-tip">Корзина</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</body>
+</html>
